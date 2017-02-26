@@ -1,0 +1,12 @@
+runtime: python27
+threadsafe: true
+api_version: 1
+
+handlers:
+- url: /mazerunner/
+  static_files: mazeRunner.html
+  upload: mazeRunner.html
+
+- url: /
+  static_files: mazeRunner.html
+  upload: mazeRunner.html

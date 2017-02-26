@@ -1,0 +1,432 @@
+<html>
+<head>
+</head>
+<script>
+//manojkumargupta@gmail.com
+
+var ht;
+var wd;
+var maze;
+var pathVisited;
+var input;
+var step;
+
+function main(){
+ht=document.getElementById("ht").value;
+wd=document.getElementById("wd").value;
+maze=new Array(ht);
+pathVisited=new Array(wd);
+input=new Array(ht*wd);
+step=0;
+var ret;
+input=document.getElementById("maze").value.split('');
+  for(var rowIndex=0;rowIndex<ht;rowIndex++){
+       maze[rowIndex]=new Array(wd);
+       pathVisited[rowIndex]=new Array(wd);
+    for(colIndex=0;colIndex<wd;colIndex++){
+      if(maze[rowIndex][colIndex]=input[rowIndex*ht+colIndex].match(/0|a|e|i|o|u|\s/i)){  
+      maze[rowIndex][colIndex]="O";
+      }else{
+      maze[rowIndex][colIndex]="X";
+      }
+      pathVisited[rowIndex][colIndex]=0;
+      //fprintf(stderr,"%s\n",maze[rowIndex]);
+    }
+  }
+
+  if(maze[0][0] === "O" && maze[ht-1][wd-1] === "O"){
+    ret=mazeUp(0,0);
+  } 
+
+  var message="<table align='center' style='width:700px' border=1><tr><th>InputGiven:</th><th>Maze View:</th><th>PathTravered:</th></tr>\n<tr><td align='center'><table>";
+  for(var rowIndex=0;rowIndex<ht;rowIndex++){
+      message+="<tr>";
+    for(colIndex=0;colIndex<wd;colIndex++){
+      message+="<td>"+input[rowIndex*ht+colIndex]+"</td>";
+      }
+      message+="</tr>\n";
+    }
+  message+="</table></td><td align='center'><table>";
+  var stopArray=['&#9763','&#9760'];
+  var ok='o';
+  var goArray=['&#9816', '&#9815', '&#9814', '&#9813', '&#9812', '&#9731'];
+  //alert(Math.random+'    '+stopArray.length);
+  var go=goArray[Math.floor(Math.random()*goArray.length)];
+  var stop=stopArray[Math.floor(Math.random()*stopArray.length)];
+  for(rowIndex=0;rowIndex<ht;rowIndex++){
+      message+="<tr>";
+    for(colIndex=0;colIndex<wd;colIndex++){
+      //fprintf(stderr,"%c",maze[rowIndex][colIndex]);
+      if(maze[rowIndex][colIndex] === "O"){
+      message+="<td>"+ok+"</td>";
+      }else{
+      message+="<td>"+stop+"</td>";
+      }
+    }
+      message+="</tr>\n";
+  }
+  message+="</table></td><td align='center'><table >";
+  for(rowIndex=0;rowIndex<ht;rowIndex++){
+      message+="<tr>";
+    for(colIndex=0;colIndex<wd;colIndex++){
+      if(pathVisited[rowIndex][colIndex]>0){
+      //message+="<td>"+go+'-'+rowIndex+'-'+colIndex+'-'+pathVisited[rowIndex].length+'-'+pathVisited[rowIndex][colIndex]+"</td>";
+        message+="<td>"+go+"</td>";
+      }else{
+      //message+="<td>0</td>";
+      if(maze[rowIndex][colIndex] === "O"){
+      message+="<td>"+ok+"</td>";
+      }else{
+      message+="<td>"+stop+"</td>";
+      }
+      }
+    //  fprintf(stderr,"%d",(pathVisited[rowIndex][colIndex]>0?1:0));
+    }
+      message+="</tr>";
+  }
+  message+="</table></td></tr></table>";
+   
+  if(ret >= 1){
+    //alert("1: You will be able to go out of the Maze :)");
+    document.getElementById("output").innerHTML='<html><body><h4 align=center>You will be able to go out of the Maze.</h3><br>'+message+'</body></html>';   
+    return 0;
+  }else{
+    //alert("0: Ah.... its deep ... without any path to go out  :(");
+    document.getElementById("output").innerHTML='<html><body><h4 align=center>Ah.... its deep ... without any path to go out.</h3><br>'+message+'</body></html>';
+    return 1;
+  }
+  return 1;
+}
+
+function mazeUp(rowIndex,colEntryPosition){
+  var colCurrentPosition;
+  var ret;
+  colCurrentPosition=colEntryPosition;
+  if(rowIndex == ht-1 && colEntryPosition == wd-1){
+    pathVisited[rowIndex][colCurrentPosition]=++step;
+    return 1;
+  }
+
+  if(pathVisited[rowIndex][colEntryPosition]){
+    pathVisited[rowIndex][colCurrentPosition]=++step;
+    return 0;
+  }else{
+    pathVisited[rowIndex][colCurrentPosition]=++step;
+  }
+  if(rowIndex < ht-1){
+   // Moving Up Attempt :
+    for(;colCurrentPosition>=0;){
+      //fprintf(stderr,"rowIndex=%d,colIndex=%d\n",rowIndex,colCurrentPosition);
+      if(maze[rowIndex+1][colCurrentPosition]==='O') {
+//  fprintf(stderr,"Movingup to rowIndex=%d,colIndex=%d\n",rowIndex+1,colCurrentPosition);
+    ret=mazeUp(rowIndex+1,colCurrentPosition);
+    if(ret >= 1){
+      return ret;
+    }
+      }
+      if(colCurrentPosition>0 && maze[rowIndex][colCurrentPosition-1] === "O"){
+    colCurrentPosition=colCurrentPosition-1;
+    pathVisited[rowIndex][colCurrentPosition]=++step;
+      }else{
+    break;
+      }
+      //sleep(1);
+    }
+    if(colEntryPosition<wd-1 && maze[rowIndex][colEntryPosition+1] === "O"){
+      colCurrentPosition=colEntryPosition+1;
+    pathVisited[rowIndex][colCurrentPosition]=++step;
+
+    for(;colCurrentPosition<wd;){
+      if(maze[rowIndex+1][colCurrentPosition]==="O") {
+//  fprintf(stderr,"MovingUp to rowIndex=%d,colIndex=%d\n",rowIndex+1,colCurrentPosition);
+    ret=mazeUp(rowIndex+1,colCurrentPosition);
+    if(ret >= 1){
+      return ret;
+    }
+      }      
+      if(colCurrentPosition<wd-1 && maze[rowIndex][colCurrentPosition+1] === "O"){
+    colCurrentPosition=colCurrentPosition+1;
+    pathVisited[rowIndex][colCurrentPosition]=++step;
+      }else{
+    break;
+      }
+      //sleep(1);
+    }
+    }
+
+// Moving Down Step
+    colCurrentPosition=colEntryPosition;
+    for(;colCurrentPosition>=0;){
+ //     fprintf(stderr,"Moving Down Attempt - rowIndex=%d,colIndex=%d\n",rowIndex,colCurrentPosition);
+      //alert(rowIndex+' '+colCurrentPosition+' '); //+maze[rowIndex-1][colCurrentPosition]);
+      if(rowIndex > 0 && maze[rowIndex-1][colCurrentPosition] === "O") {
+//  fprintf(stderr,"Movingdown to rowIndex=%d,colIndex=%d\n",rowIndex-1,colCurrentPosition);
+    ret=mazeUp(rowIndex-1,colCurrentPosition);
+    if(ret >= 1){
+      return ret;
+    }
+      }
+      if(colCurrentPosition>0 && maze[rowIndex][colCurrentPosition-1] === "O"){
+    colCurrentPosition=colCurrentPosition-1;
+    pathVisited[rowIndex][colCurrentPosition]=++step;
+      }else{
+    break;
+      }
+      //sleep(1);
+    }
+    if(colEntryPosition<wd && maze[rowIndex][colEntryPosition+1] === "O"){
+      colCurrentPosition=colEntryPosition+1;
+    pathVisited[rowIndex][colCurrentPosition]=++step;
+    }else{ 
+      return 0;
+    }
+
+    for(;colCurrentPosition<wd;){
+      if(rowIndex > 0 && maze[rowIndex-1][colCurrentPosition] ==="O") {
+    //fprintf(stderr,"Movingdown to rowIndex=%d,colIndex=%d\n",rowIndex-1,colCurrentPosition);
+    ret=mazeUp(rowIndex-1,colCurrentPosition);
+    if(ret >= 1){
+      return ret;
+    }
+      }
+      if(colCurrentPosition<wd && maze[rowIndex][colCurrentPosition+1] === "O"){
+    colCurrentPosition=colCurrentPosition+1;
+    pathVisited[rowIndex][colCurrentPosition]=++step;
+      }else{
+    return 0;
+      }
+      //sleep(1);
+    }
+
+  }
+  if(rowIndex == ht-1){
+    for(;colCurrentPosition<wd-1;){
+      //fprintf(stderr,"rowIndex=%d,colIndex=%d\n",rowIndex,colCurrentPosition);
+      if(maze[rowIndex][colCurrentPosition+1] === "O"){
+    colCurrentPosition=colCurrentPosition+1;
+    pathVisited[rowIndex][colCurrentPosition]=++step;
+      }else if(rowIndex > 0 && maze[rowIndex-1][colCurrentPosition] ==="O"){
+// Moving Down Step
+        //fprintf(stderr,"Movingdown to rowIndex=%d,colIndex=%d\n",rowIndex-1,colCurrentPosition);
+        ret=mazeUp(rowIndex-1,colCurrentPosition);
+        if(ret >= 1){
+          return ret;
+        }
+      }else{
+        return 0;
+      }
+    }
+    if(colCurrentPosition==wd-1){
+      pathVisited[rowIndex][colCurrentPosition]=++step;
+      return 1;
+    }
+  }
+  return 0;
+}
+
+</script>
+<body>
+<h1>Maze Path</h1>
+<h5>
+<u>Description:</u><br>
+  <ol type="1">
+  <li> Program to check if there is a way out of a maze.</li>
+  <li> It take input of characters, and makes a maze/grid/matrix(NxM) of it.</li>
+  <li> Entrance to the maze is (0,0) and the exit is at point (N,M)</li>
+  <li> Character which match a space, 0 or vowels(a,e,i,o,u) is considered as GO/Pass/Allow. Rest is noGo/Blockage.</li>
+  <li> Allowed moves : (1) Left Right, (2) Forward Backward. </li>
+  <li> Not allowed : (1) Cross Move</li>
+  </ol>
+</h5>
+<form>
+<table>
+<tr><td> Height :</td><td>
+<select id='ht' name="ht" value="10">
+<option value=10>10</option>
+<option value=15>15</option>
+<option value=20>20</option>
+<option value=25>25</option>
+<option value=50>50</option>
+</select>
+</td>
+<td> Width  :</td><td>
+<select id='wd' name="wd">
+<option value=10>10</option>
+<option value=15>15</option>
+<option value=20>20</option>
+<option value=25>25</option>
+<option value=50>50</option>
+</select>
+<td> Enter a string: </td><td><input type="text" id='maze' name="maze" size='140'/></td>
+<td colspan=2><input type="submit" onClick="main(); return false;" value=Run>
+</tr> 
+</table>
+</form>
+<br>
+<br>
+<div id="output">
+</div>
+<pre>
+
+Input: OOOOOOOOOOXXXXXXXXXXOOOOOOOOOOXXXXXXXXXXOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+Grid View:   PathTravered:
+OOOOOOOOOO  1111111111
+XXXXXXXXXX  0000000000
+OOOOOOOOOO  0000000000
+XXXXXXXXXX  0000000000
+OOOOOOOOOO  0000000000
+OOOOOOOOOO  0000000000
+OOOOOOOOOO  0000000000
+OOOOOOOOOO  0000000000
+OOOOOOOOOO  0000000000
+OOOOOOOOOO  0000000000
+
+Input: OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+Grid View:   PathTravered:
+OOOOOOOOOO  1000000000
+OOOOOOOOOO  1000000000
+OOOOOOOOOO  1000000000
+OOOOOOOOOO  1000000000
+OOOOOOOOOO  1000000000
+OOOOOOOOOO  1000000000
+OOOOOOOOOO  1000000000
+OOOOOOOOOO  1000000000
+OOOOOOOOOO  1000000000
+OOOOOOOOOO  1111111111
+
+Input: OOOOOOOOOOOOOOOOOOOXOOOOOOOOXOOOOOOOOXOOOOOOOOXOOOOOOOOXOOOOOOOOXOOOOOXXXXXOOOOOOOOOOOOOOOOOOOOOOOOO
+Grid View:   PathTravered:
+OOOOOOOOOO  1111111111
+OOOOOOOOOX  1111111110
+OOOOOOOOXO  1111111100
+OOOOOOOXOO  1111111000
+OOOOOOXOOO  1111110000
+OOOOOXOOOO  1111100000
+OOOOXOOOOO  1111000000
+XXXXXOOOOO  0000000000
+OOOOOOOOOO  0000000000
+OOOOOOOOOO  0000000000
+
+Input: OOOOOOOOOOOOOOOOOOOXOOOOOOOOOOOOOOOOOXOOOOOOOOXOOOOOOOOXOOOOOOOOXOOOOOXXXXXOOOOOOOOOOOOOOOOOOOOOOOOO
+Grid View:   PathTravered:
+OOOOOOOOOO  1000000000
+OOOOOOOOOX  1000000000
+OOOOOOOOOO  1111111110
+OOOOOOOXOO  1111111010
+OOOOOOXOOO  1111110010
+OOOOOXOOOO  1111100010
+OOOOXOOOOO  1111000010
+XXXXXOOOOO  0000000010
+OOOOOOOOOO  0000000010
+OOOOOOOOOO  0000000011
+
+Input: OOOOOOOOOOOOOOOOOOOXOOOOOOOOOOOOOOOOOXXOOOOOOOXOOOOOOOOXOOOOOOOOXOOXXXXXXXXOOOOOOOOOOOOOOOOOOOOOOOOO
+Grid View:   PathTravered:
+OOOOOOOOOO  1000000000
+OOOOOOOOOX  1000000000
+OOOOOOOOOO  1111111111
+OOOOOOOXXO  1111111001
+OOOOOOXOOO  1111110001
+OOOOOXOOOO  1111101111
+OOOOXOOXXX  1111001000
+XXXXXOOOOO  0000001000
+OOOOOOOOOO  0000001000
+OOOOOOOOOO  0000001111
+
+Input: OOOOOOOOOOOOOOOOOOOXOOOOOOOOOOOOOOOOOXXOOOOOOOXOOOOOOOOXOOOOOOOOXOXXXXXXXXXOOOOOOOOOOOOOOOOOOOOOOOOO
+Grid View:   PathTravered:
+OOOOOOOOOO  1111111111
+OOOOOOOOOX  1111111110
+OOOOOOOOOO  1111111111
+OOOOOOOXXO  1111111001
+OOOOOOXOOO  1111110111
+OOOOOXOOOO  1111101111
+OOOOXOXXXX  1111000000
+XXXXXOOOOO  0000000000
+OOOOOOOOOO  0000000000
+OOOOOOOOOO  0000000000
+
+
+Input: OOOOOOOOOOXXXXXXOOOXOOOOOOOOOOOOXXXOOXXOOOOOOOXOOOOOOOOXOOOOOOOOOOXXXXXXXXOXXXXXOOOOOOOOOOOOOOOOOOOO
+Grid View:   PathTravered:
+OOOOOOOOOO  1111111000
+XXXXXXOOOX  0000001000
+OOOOOOOOOO  0000001000
+OOXXXOOXXO  0000011000
+OOOOOOXOOO  0000110000
+OOOOOXOOOO  0000100000
+OOOOOOXXXX  0000100000
+XXXXOXXXXX  0000100000
+OOOOOOOOOO  0000100000
+OOOOOOOOOO  0000111111
+
+Input: OOOOOOOOOOXXXXXXOOOXOOOOOOOOOOXXXXXXXOOOOOOOOOOOOOOOOOOXXXXXXXXXOOXXXXXXXXOXXXXXXXXXXXXOOOOOOOOOOOOO
+Grid View:   PathTravered:
+OOOOOOOOOO  1111111111
+XXXXXXOOOX  0000001110
+OOOOOOOOOO  1111111111
+XXXXXXXOOO  0000000111
+OOOOOOOOOO  1111111111
+OOOOOXXXXX  1111100000
+XXXXOOXXXX  0000110000
+XXXXOXXXXX  0000100000
+XXXXXXXOOO  0000000000
+OOOOOOOOOO  0000000000
+
+
+Input: OOOOOOOOOOXXXXOOXXXXXXXOOOOXXXXXOOXXOOXXXOOXXXXOOXXXOOXXOOXXXXXOOOOXXXXXXXOOXXXXXXXXXXXXXXOOOOOOOOOO
+Grid View:   PathTravered:
+OOOOOOOOOO  1111111111
+XXXXOOXXXX  0000110000
+XXXOOOOXXX  0001111000
+XXOOXXOOXX  0011001100
+XOOXXXXOOX  0110000110
+XXOOXXOOXX  0011001100
+XXXOOOOXXX  0001111000
+XXXXOOXXXX  0000110000
+XXXXXXXXXX  0000000000
+OOOOOOOOOO  0000000000
+
+Input: OOOOOOOOOOXXXXOOXXXXXXXOOOOXXXXXOOXXOOXXXOOXXXXOOXXXOOXXOOXXXXXOOOOXXXXXXXOOXXXXXXXXOXXXXXOOOOOOOOOO
+Grid View:   PathTravered:
+OOOOOOOOOO  1111100000
+XXXXOOXXXX  0000100000
+XXXOOOOXXX  0001100000
+XXOOXXOOXX  0011000000
+XOOXXXXOOX  0010000000
+XXOOXXOOXX  0011000000
+XXXOOOOXXX  0001100000
+XXXXOOXXXX  0000100000
+XXXXOXXXXX  0000100000
+OOOOOOOOOO  0000111111
+
+Input: OOOOOOOOOOOOXOOOOOOOOOXOOOOOOOOOXOOOOOOOXXXOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+Grid View:   PathTravered:
+OOOOOOOOOO  1111000000
+OOXOOOOOOO  1101000000
+OOXOOOOOOO  1101000000
+OOXOOOOOOO  1101000000
+XXXOOOOOOO  0001000000
+OOOOOOOOOO  0001000000
+OOOOOOOOOO  0001000000
+OOOOOOOOOO  0001000000
+OOOOOOOOOO  0001000000
+OOOOOOOOOO  0001111111
+
+Input: OOXXXXXXXXOOXOOOOOOOOOXOXXXOOOOOOOXXXXOOXXXXOOOOOOOOOOOOXXXXOXXXOOOOOOOXXXXXXXXOOOOOOOOOOOOOOOOOOOOO
+Grid View:   PathTravered:
+OOXXXXXXXX  1100000000
+OOXOOOOOOO  1101111100
+OOXOXXXOOO  1101000110
+OOOOXXXXOO  1111000010
+XXXXOOOOOO  0000011110
+OOOOOOXXXX  0000010000
+OXXXOOOOOO  0000111111
+OXXXXXXXXO  0000000001
+OOOOOOOOOO  0000000001
+OOOOOOOOOO  0000000000
+
+</pre>
+</body>
+</html>
+
