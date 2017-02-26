@@ -7,7 +7,7 @@ Description:
   1) Program to check if there is a way out of a maze.
   2) It take input of 100 characters, and makes a maze(grid) of 10x10.
   3) Entrance to the maze is (0,0) and the exit is at point (9,9)
-  4) Character 0 is considered as pass/path/allow, all other characters are considered as blockage.
+  4) Character O(Alphabet O) is considered as pass/path/allow, all other characters are considered as blockage.
   5) Allowed moves : (1) Left Right, (2) Forward Backward. Not allowed : (1) Cross Move
   6) Return of 0 means, no path through maze.
   7) Return of 1 means, there is path through maze.
